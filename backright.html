@@ -23,28 +23,14 @@
         </a></p>
         
     <script>
-    var buttonShort = document.createElement("button");
-buttonShort.innerHTML = "Generate Short Password";
-
-var body = document.getElementsByTagName("body")[0];
-
-buttonShort.style.width = '200px'; // setting the width to 200px
-buttonShort.style.height = '200px'; // setting the height to 200px
-buttonShort.style.background = 'teal'; // setting the background color to teal
-buttonShort.style.color = 'white'; // setting the color to white
-buttonShort.style.fontSize = '20px'; // setting the font size to 20px
-
-body.appendChild(buttonShort);
-
-buttonShort.addEventListener("click", function play() {
+      function play() {
         var audio = document.getElementById("audio");
         audio.play();
-});
+      }
     </script>
     
     <input type="button" value="PLAY" onclick="play()">
     <audio id="audio" src="https://raw.githubusercontent.com/Vault-ish/Vault-ish.github.io/main/Backright.mp3"></audio>
-
 
     </body>
 </html>
