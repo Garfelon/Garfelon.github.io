@@ -1,40 +1,65 @@
 <!DOCTYPE html>
-<html>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <audio autoplay>
-        <source src="https://raw.githubusercontent.com/Vault-ish/Vault-ish.github.io/main/bgm.mp3" type="audio/mp3">
-    </audio> 
-    <style>
-        { margin: 0; padding: 0; }
-    
-        html { 
-            background: url('https://raw.githubusercontent.com/Vault-ish/Vault-ish.github.io/main/55rmt2vc0pw51.jpg') no-repeat center center fixed; 
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-        }
-    </style>
-    <head>
-        <title>QTD</title>
-    </head>
-    <body>
-        <h1 style="font-family:Impact Bold;color:Black;">Quinn's HTML Test Site</h1>
-        <h1 style="font-family:Arial;color:White;">Press Button below to download all of my projects, ask me for the password.</h1>
-                <a href="https://raw.githubusercontent.com/Vault-ish/Vault-ish.github.io/main/Archive.zip" download>
-         <button class="btn" style="width:100%"><i class="fa fa-download"></i> Download</button>
-        </a></p>
-
-        
+<style>
+    body {
+        font-family: "Comic Sans MS";
+        background-image:URL('BGI.png');
+        background-repeat:no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        text-align:Center;
+    }
+</style>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Library</title>
+    <h1 style="font-size:600%; text-decoration-line: underline overline; text-decoration-color: mediumpurple;"><b>The Library</b></h1>
+    <h3 style="font-size:200%;"> All of my websites are listed below.</h3>
+</head>
+<body>
+<p style="font-size:200%;"><a href="https://Garfelon.github.io/PBJ"> PB&J recipe </a></p>
+<p style="font-size:200%;"><a href="https://Garfelon.github.io/Ancient"> Old landing page (download no longer works) </a></p>
+</body>
+<footer style="    position: fixed;
+    left: 0;
+    bottom: 0;">
+<label for="play">Music</label>
+<input id="play" type="checkbox" value="PLAY" onchange="play()"/>
     <script>
-      function play() {
-        var audio = document.getElementById("audio");
-        audio.play();
-      }
+        function play() {
+            const audio = document.getElementById('audio');
+            const checkbox = document.getElementById('play');
+            if (!audio) return;
+            if (checkbox && checkbox.checked) {
+                const p = audio.play();
+                if (p && typeof p.catch === 'function') {
+                    p.catch(function(){});
+                }
+            } else {
+                audio.pause();
+            }
+        }
     </script>
-
-    <input type="button" value="PLAY" onclick="play()">
-    <audio id="audio" src="https://raw.githubusercontent.com/Vault-ish/Vault-ish.github.io/main/bgm.mp3"></audio>
-
-    </body>
+<audio id="audio" src="bgm.mp3"></audio>
+    <label for="VOL">Volume</label>
+    <input id="VOL" type="number" min="0" max="100" step="1" value="100" />
+    <script>
+        (function(){
+            const volInput = document.getElementById('VOL');
+            const audio = document.getElementById('audio');
+            if (!volInput || !audio) return;
+            const clamp = v => Math.min(100, Math.max(0, v));
+            const applyVolume = () => {
+                const parsed = parseInt(volInput.value, 10);
+                const v = clamp(Number.isFinite(parsed) ? parsed : 0);
+                volInput.value = v;
+                audio.volume = v / 100;
+            };
+            volInput.addEventListener('input', applyVolume);
+            volInput.addEventListener('change', applyVolume);
+            applyVolume();
+        })();
+    </script>
+</footer>
 </html>
+<!-- This is a new landing page to display all of my projects with clickable links. I also added a music player and volume slider. My friends helped me with the design of the page by recommending me colors and fonts. The image is from my friends backyard even. I hope in future updates the site becomes more complex and interactive. as I learn more from the course. 8/22/2025-->
