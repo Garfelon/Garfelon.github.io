@@ -7,25 +7,63 @@
         <h1 style="font-size: 400%; text-align: center"> Quinn Badgett </h1>
     </header>
 </head>
+<style>
+    .flex-container {
+        display: flex;
+        background-color: #00ffff;
+    }
+
+    .flex-container > fc {
+        background-color: #ff7f50;
+        margin: 10px;
+        padding: 10px;
+        min-width: 10%;
+        max-height: 100%;
+        z-index: 1;
+    }
+</style>
+<style>.divmain {
+    word-wrap: anywhere;
+    font-family: 'Berlin Sans FB';
+    font-size: 140%;
+    margin-left: 15%;
+    margin-right: 15%;
+    max-width: 80%;
+    text-indent: 3%;
+    background-color: coral;
+}</style>
 <body>
 <main class="main">
-    <style>.main {
-        font-family: 'Berlin Sans FB';
-        font-size: 140%;
-        margin-left: 15%;
-        margin-right: 15%;
-        max-width: 70%;
-        text-indent: 3%;
-        background-color: coral;
-    }</style>
-    <div>
+    <fc class="flex-container">
+        <fc>
+            <img src="Self.png" alt="A photo of myself. " style="position: relative; z-index: 3; border-radius: 90%; max-width: 90%; max-height: 100%; border: 10px #ff7f50; background-color: coral; padding: 10px; margin-bottom: 10px; margin-top: 10px; word-wrap: break-word ">
+        </fc>
+        <fc>
+            <container style="position: relative;">
+        <div class="divmain">
+            <topleft style="position: absolute; top: 50%; left: 16px; font-size: 70%; white-space: nowrap"><--------- Its Me</topleft>
         <p>
             Hello, my name is Quinn Badgett. I am from the neighboring Pike County, commuting to class on Tuesdays and Thursdays. I have taken 2 previous coding classes, one for python and another for lua. I like working on old electronics, specifically TVs and computers, and I like working on cars. I most often use my computers for homework and videogames, however i also use them occasionally to code small interest projects in scripting languages like batch. I like scripting languages very much because of their simple syntax and the inherent challenge of making a program from scripting commands. I have also previously made a few websites to learn basic HTML and hosted them on Github's free website hosting service.
         </p>
+        </div>
+            </container>
+            </fc>
+    </fc>
+    <h2>Things I like to do:</h2>
+    <div class="divmain">
+    <ul>
+        <li>Scripting</li>
+        <li>Working on old electronics</li>
+        <li>Working on cars</li>
+        <li>Playing videogames</li>
+        <li>Frisbee Golf</li>
+    </ul>
     </div>
 </main>
 </body>
-<footer>
-
+<div class="divmain">
+<footer style="text-align: center; width: 100%;">
+Here is a link to my Github Pages site: <a href="https://Garfelon.github.io">Garfelon.github.io</a>
 </footer>
+</div>
 </html>
