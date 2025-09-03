@@ -32,7 +32,10 @@
     </div>
     <div>
       <label for="key">Key</label>
-      <input id="key" type="text" placeholder="myKey">
+      <div class="row">
+        <input id="key" type="text" placeholder="myKey">
+        <button id="randKey" type="button" title="Generate random 4-char key">Random</button>
+      </div>
     </div>
   </div>
 
@@ -96,12 +99,27 @@
   const $ = (id)=>document.getElementById(id);
   const idEl = $('id'), keyEl = $('key'), urlEl = $('url');
   const btn = $('btn'), err = $('err'), ctEl = $('ct'), copyBtn = $('copy'), snippetEl = $('snippet'), exampleEl = $('example');
+  const randBtn = $('randKey');
 
   function updateExample(id, key){
     const base = window.location.origin;
     const path = '/Redirector/';
     const payload = (id || '') + (key || '');
     exampleEl.textContent = payload ? ('Example link: ' + base + path + payload) : '';
+  }
+
+  const URL_SAFE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+  function randomKey(len){
+    len = Math.max(0, len|0);
+    const out = [];
+    if (window.crypto && window.crypto.getRandomValues) {
+      const buf = new Uint8Array(len);
+      window.crypto.getRandomValues(buf);
+      for (let i = 0; i < len; i++) out.push(URL_SAFE[buf[i] & 63]);
+    } else {
+      for (let i = 0; i < len; i++) out.push(URL_SAFE[Math.floor(Math.random()*URL_SAFE.length)]);
+    }
+    return out.join('');
   }
 
   function run(){
@@ -141,6 +159,13 @@
       setTimeout(()=>copyBtn.textContent='Copy', 1000);
     }catch{}
   });
+
+  if (randBtn) {
+    randBtn.addEventListener('click', function(){
+      keyEl.value = randomKey(4);
+      updateExample((idEl.value || '').trim(), keyEl.value);
+    });
+  }
 
   // Prefill small demo values for convenience
   idEl.value = 'A';
