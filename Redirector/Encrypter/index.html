@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirector - Encrypter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root { --gap:12px; }
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; line-height: 1.4; }
+        .wrap { max-width: 640px; margin: 0 auto; }
+        label { display:block; margin-top: var(--gap); font-weight: 600; }
+        input[type="text"], input[type="password"], input[type="url"], textarea { width: 100%; box-sizing: border-box; padding: 8px; font-size: 16px; }
+        button { margin-top: var(--gap); padding: 8px 12px; font-size: 16px; cursor: pointer; }
+        .row { display: flex; gap: 8px; }
+        .row > * { flex: 1; }
+        .help { color: #444; font-size: 0.9em; margin-top: 4px; }
+        .error { color: #b00020; margin-top: var(--gap); white-space: pre-wrap; }
+        .output { margin-top: 16px; }
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+        small { color: #555; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+  <h1 style="margin-top:0;">Redirector Encrypter</h1>
+  <p class="help">Create the ciphertext to paste into the Redirector page's entries map.</p>
+
+  <div class="row">
+    <div>
+      <label for="id">Id (single character)</label>
+      <input id="id" type="text" maxlength="1" placeholder="A">
+    </div>
+    <div>
+      <label for="key">Key</label>
+      <input id="key" type="text" placeholder="myKey">
+    </div>
+  </div>
+
+  <label for="url">URL to protect (http/https)</label>
+  <input id="url" type="url" placeholder="https://example.com/path">
+
+  <button id="btn">Encrypt</button>
+  <div id="err" class="error" role="alert" aria-live="polite"></div>
+
+  <div class="output">
+    <label for="ct">Ciphertext (base64url)</label>
+    <div class="row">
+      <input id="ct" class="mono" type="text" readonly placeholder="Result appears here">
+      <button id="copy" type="button" title="Copy">Copy</button>
+    </div>
+
+    <label for="snippet" style="margin-top:12px;">entries snippet</label>
+    <textarea id="snippet" rows="2" class="mono" readonly placeholder="entries['A'] = '...';"></textarea>
+
+    <div class="help" id="example"></div>
+    <details style="margin-top:12px;">
+      <summary>How to use</summary>
+      <small>
+        1) Paste the ciphertext into Redirector/index.html: entries['ID'] = 'CIPHERTEXT'.<br>
+        2) Share a link where the payload is id+key (e.g., /Redirector/AmyKey).
+      </small>
+    </details>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  function bytesToB64u(bytes) {
+    let bin = '';
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin).replace(/=+$/,'').replace(/\+/g,'-').replace(/\//g,'_');
+  }
+  const te = new TextEncoder();
+
+  function xorTransform(dataBytes, keyString, idChar) {
+    const key = String(keyString || '');
+    if (!key) return null;
+    const keyBytes = te.encode(key);
+    const idCode = idChar && idChar.length ? (idChar.charCodeAt(0) & 0xFF) : 0;
+    const out = new Uint8Array(dataBytes.length);
+    for (let i = 0; i < dataBytes.length; i++) out[i] = dataBytes[i] ^ keyBytes[i % keyBytes.length] ^ idCode;
+    return out;
+  }
+  function isHttpUrl(s) {
+    try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; }
+  }
+  function encryptUrlForId(idChar, key, url) {
+    if (!idChar || idChar.length !== 1) throw new Error('idChar must be a single character.');
+    const pt = te.encode(String(url || ''));
+    const ct = xorTransform(pt, String(key || ''), idChar);
+    if (!ct) throw new Error('Key must be at least 1 character.');
+    return bytesToB64u(ct);
+  }
+
+  const $ = (id)=>document.getElementById(id);
+  const idEl = $('id'), keyEl = $('key'), urlEl = $('url');
+  const btn = $('btn'), err = $('err'), ctEl = $('ct'), copyBtn = $('copy'), snippetEl = $('snippet'), exampleEl = $('example');
+
+  function updateExample(id, key){
+    const base = window.location.origin;
+    const path = '/Redirector/';
+    const payload = (id || '') + (key || '');
+    exampleEl.textContent = payload ? ('Example link: ' + base + path + payload) : '';
+  }
+
+  function run(){
+    err.textContent = '';
+    ctEl.value = '';
+    snippetEl.value = '';
+    exampleEl.textContent = '';
+    const id = (idEl.value || '').trim();
+    const key = keyEl.value || '';
+    const url = (urlEl.value || '').trim();
+
+    if (!id || id.length !== 1) { err.textContent = 'Please provide a single-character id (e.g., A).'; updateExample(id, key); return; }
+    if (!key) { err.textContent = 'Key is required (at least 1 character).'; updateExample(id, key); return; }
+    if (!isHttpUrl(url)) { err.textContent = 'URL must be http(s).'; updateExample(id, key); return; }
+
+    try{
+      const ct = encryptUrlForId(id, key, url);
+      ctEl.value = ct;
+      snippetEl.value = "entries['" + id + "'] = '" + ct + "';";
+      updateExample(id, key);
+    }catch(e){
+      err.textContent = 'Encryption error.';
+    }
+  }
+
+  btn.addEventListener('click', run);
+  [idEl, keyEl, urlEl].forEach(el => el.addEventListener('keydown', function(ev){ if(ev.key === 'Enter'){ ev.preventDefault(); run(); }}));
+  copyBtn.addEventListener('click', async function(){
+    if (!ctEl.value) return;
+    try{
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(ctEl.value);
+      } else {
+        ctEl.select(); document.execCommand && document.execCommand('copy');
+      }
+      copyBtn.textContent = 'Copied';
+      setTimeout(()=>copyBtn.textContent='Copy', 1000);
+    }catch{}
+  });
+
+  // Prefill small demo values for convenience
+  idEl.value = 'A';
+  keyEl.value = 'myKey';
+  urlEl.placeholder = 'https://example.com/path';
+})();
+</script>
+</body>
+</html>

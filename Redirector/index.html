@@ -9,126 +9,125 @@
 <noscript>This page requires JavaScript to redirect.</noscript>
 <pre id="msg"></pre>
 <script>
-(function () {
-  'use strict';
+    (function () {
+        'use strict';
 
-  // Map of entries: idChar -> base64url ciphertext of the destination URL (encrypted with XOR)
-  // Add your own entries here. Example usage is documented at the bottom of this file.
-  const entries = {
-      'A': "REx-VEsWFyVjV0NfZkEWT1dn"
-      // 'A': 'base64url_ciphertext_here'
-  };
+        // Map of entries: idChar -> base64url ciphertext of the destination URL, Add entries here.
+        const entries = {
+            'A': "REx-VEsWFyVjV0NfZkEWT1dn"
+            // 'A': 'base64url_ciphertext_here'
+        };
 
-  // ---- Helpers: base64url <-> bytes, XOR, etc. ----
-  function b64uToBytes(b64u) {
-    if (!b64u) return new Uint8Array(0);
-    const b64 = b64u.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(b64u.length / 4) * 4, '=');
-    const bin = atob(b64);
-    const out = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-    return out;
-  }
-  function bytesToB64u(bytes) {
-    let bin = '';
-    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-    return btoa(bin).replace(/=+$/,'').replace(/\+/g,'-').replace(/\//g,'_');
-  }
-  const te = new TextEncoder();
-  const td = new TextDecoder();
-
-  function xorTransform(dataBytes, keyString, idChar) {
-    const key = String(keyString || '');
-    if (!key) return null; // require at least 1-char key
-    const keyBytes = te.encode(key);
-    const idCode = idChar && idChar.length ? (idChar.charCodeAt(0) & 0xFF) : 0;
-    const out = new Uint8Array(dataBytes.length);
-    for (let i = 0; i < dataBytes.length; i++) {
-      out[i] = dataBytes[i] ^ keyBytes[i % keyBytes.length] ^ idCode;
-    }
-    return out;
-  }
-
-  function isHttpUrl(s) {
-    try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; }
-  }
-
-  // Extract payload from a few URL forms to keep it flexible and short.
-  function getPayload() {
-    const path = window.location.pathname;
-    const hash = window.location.hash ? window.location.hash.slice(1) : '';
-    const params = new URLSearchParams(window.location.search);
-    const qp = params.get('p') || params.get('payload') || '';
-
-    // Prefer path-based payloads for brevity.
-    let payload = '';
-    const segs = path.split('/');
-    const idx = segs.findIndex(s => s.toLowerCase() === 'redirector');
-    if (idx >= 0) {
-      if (segs.length > idx + 1 && segs[idx + 1]) {
-        payload = segs[idx + 1]; // /Redirector/<payload>
-      } else {
-        // Attempt no-slash variant: /Redirector<payload>
-        const marker = '/' + segs[idx];
-        const pos = path.toLowerCase().indexOf(marker.toLowerCase());
-        if (pos >= 0) {
-          const rest = path.slice(pos + marker.length);
-          if (rest && rest[0] !== '/') payload = rest;
+        // ---- Helpers: base64url <-> bytes, XOR, etc. ----
+        function b64uToBytes(b64u) {
+            if (!b64u) return new Uint8Array(0);
+            const b64 = b64u.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(b64u.length / 4) * 4, '=');
+            const bin = atob(b64);
+            const out = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+            return out;
         }
-      }
-    }
+        function bytesToB64u(bytes) {
+            let bin = '';
+            for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+            return btoa(bin).replace(/=+$/,'').replace(/\+/g,'-').replace(/\//g,'_');
+        }
+        const te = new TextEncoder();
+        const td = new TextDecoder();
 
-    return payload || hash || qp || '';
-  }
+        function xorTransform(dataBytes, keyString, idChar) {
+            const key = String(keyString || '');
+            if (!key) return null; // require at least 1-char key
+            const keyBytes = te.encode(key);
+            const idCode = idChar && idChar.length ? (idChar.charCodeAt(0) & 0xFF) : 0;
+            const out = new Uint8Array(dataBytes.length);
+            for (let i = 0; i < dataBytes.length; i++) {
+                out[i] = dataBytes[i] ^ keyBytes[i % keyBytes.length] ^ idCode;
+            }
+            return out;
+        }
 
-  function run() {
-    const msg = document.getElementById('msg');
-    const payload = getPayload();
-    if (!payload) {
-      msg.textContent = 'No payload found. Use one of:\n- /Redirector/<id><key>\n- /Redirector#<id><key>\n- /Redirector?p=<id><key>';
-      return;
-    }
-    const id = payload[0];
-    const key = payload.slice(1);
-    if (!entries[id]) {
-      msg.textContent = 'Unknown id: ' + id + '. Add an entry for this id in the page source.';
-      return;
-    }
-    try {
-      const ct = b64uToBytes(entries[id]);
-      const ptBytes = xorTransform(ct, key, id);
-      if (!ptBytes) throw new Error('Empty key');
-      const url = td.decode(ptBytes);
-      if (!isHttpUrl(url)) {
-        msg.textContent = 'Invalid key or URL. Decryption did not yield a valid http(s) URL.';
-        return;
-      }
-      msg.textContent = 'Redirecting...';
-      // Use replace() to avoid leaving this page in history.
-      window.location.replace(url);
-    } catch (e) {
-      msg.textContent = 'Decryption error.';
-    }
-  }
+        function isHttpUrl(s) {
+            try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; }
+        }
 
-  // Expose a tiny helper so you can encrypt URLs from the browser console.
-  // Example:
-  //   encryptUrlForId('A', 'p@ss', 'https://example.com/path')
-  // Then paste the returned string into entries['A'] in the source.
-  window.encryptUrlForId = function (idChar, key, url) {
-    if (!idChar || idChar.length !== 1) throw new Error('idChar must be a single character (e.g., A, z, -, _).');
-    const pt = te.encode(String(url || ''));
-    const ct = xorTransform(pt, String(key || ''), idChar);
-    if (!ct) throw new Error('Key must be at least 1 character.');
-    return bytesToB64u(ct);
-  };
+        // Extract payload from a few URL forms to keep it flexible and short.
+        function getPayload() {
+            const path = window.location.pathname;
+            const hash = window.location.hash ? window.location.hash.slice(1) : '';
+            const params = new URLSearchParams(window.location.search);
+            const qp = params.get('p') || params.get('payload') || '';
 
-  run();
-})();
+            // Prefer path-based payloads for brevity.
+            let payload = '';
+            const segs = path.split('/');
+            const idx = segs.findIndex(s => s.toLowerCase() === 'redirector');
+            if (idx >= 0) {
+                if (segs.length > idx + 1 && segs[idx + 1]) {
+                    payload = segs[idx + 1]; // /Redirector/<payload>
+                } else {
+                    // Attempt no-slash variant: /Redirector<payload>
+                    const marker = '/' + segs[idx];
+                    const pos = path.toLowerCase().indexOf(marker.toLowerCase());
+                    if (pos >= 0) {
+                        const rest = path.slice(pos + marker.length);
+                        if (rest && rest[0] !== '/') payload = rest;
+                    }
+                }
+            }
+
+            return payload || hash || qp || '';
+        }
+
+        function run() {
+            const msg = document.getElementById('msg');
+            const payload = getPayload();
+            if (!payload) {
+                msg.textContent = 'No payload found. Use one of:\n- /Redirector/<id><key>\n- /Redirector#<id><key>\n- /Redirector?p=<id><key>';
+                return;
+            }
+            const id = payload[0];
+            const key = payload.slice(1);
+            if (!entries[id]) {
+                msg.textContent = 'Unknown id: ' + id + '. Add an entry for this id in the page source.';
+                return;
+            }
+            try {
+                const ct = b64uToBytes(entries[id]);
+                const ptBytes = xorTransform(ct, key, id);
+                if (!ptBytes) throw new Error('Empty key');
+                const url = td.decode(ptBytes);
+                if (!isHttpUrl(url)) {
+                    msg.textContent = 'Invalid key or URL. Decryption did not yield a valid http(s) URL.';
+                    return;
+                }
+                msg.textContent = 'Redirecting...';
+                // Use replace() to avoid leaving this page in history.
+                window.location.replace(url);
+            } catch (e) {
+                msg.textContent = 'Decryption error.';
+            }
+        }
+
+        // Helper so you can encrypt URLs from the browser console.
+        // Example:
+        //   encryptUrlForId('A', 'p@ss', 'https://example.com/path')
+        // Then paste the returned string into entries['A'] in the source.
+        window.encryptUrlForId = function (idChar, key, url) {
+            if (!idChar || idChar.length !== 1) throw new Error('idChar must be a single character (e.g., A, z, -, _).');
+            const pt = te.encode(String(url || ''));
+            const ct = xorTransform(pt, String(key || ''), idChar);
+            if (!ct) throw new Error('Key must be at least 1 character.');
+            return bytesToB64u(ct);
+        };
+
+        run();
+    })();
 </script>
 
 <!--
-HOW TO USE (author steps):
-1) Open this page in a browser and open DevTools Console.
+HOW TO USE:
+1) Open this page in a browser and open Console.
 2) Run: encryptUrlForId('A', 'myKey', 'https://example.com/path')
 3) Copy the returned ciphertext string.
 4) Edit this file and set: entries['A'] = '<that ciphertext>' near the top.
