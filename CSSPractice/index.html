@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSS Practice</title>
+
+    <!-- Internal CSS -->
+    <style>
+        /* Styling a paragraph using a class */
+        .styled-paragraph {
+            font-size: 18px;
+            color: darkblue;
+            line-height: 1.6;
+        }
+
+        /* Styling a box using an ID */
+        #styled-box {
+            width: 200px;
+            height: 100px;
+            background-color: lightgreen;
+            border: 2px solid darkgreen;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+
+            /* CSS image background */
+            /* Alt text is below at insertion. */
+            background-image: url('Resources/fowler-toad.jpg');
+            background-size: cover;  /* Make image fill the box */
+            background-position: center;
+            color: white; /* Text readable on top */
+            font-weight: bold;
+        }
+    </style>
+
+    <!-- Reference to the external CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- Inline CSS styling for heading -->
+<h1 style="color: crimson; font-family: Arial, sans-serif;">
+    Cool Animals!
+</h1>
+
+<!-- Paragraph styled with internal CSS (class) -->
+<p class="styled-paragraph">
+    I greatly enjoy toads and cats.
+</p>
+
+<!-- Alt text provided for image via "role" and "aria-label" due to CSS not having that feature by default -->
+<div role="img" aria-label="A profound sitting and frowning toad.">
+    <!-- Div styled with internal CSS (ID) and CSS image -->
+    <div id="styled-box">
+        Look at how cool he is!
+    </div>
+</div>
+<!-- List styled with external CSS file -->
+<ol>
+    <!-- 2nd Paragraph styled with internal CSS (class) -->
+    <p class="styled-paragraph"> Here is a list of the coolest animals: </p>
+    <li>Toads</li>
+    <li>Cats</li>
+    <li>Other less cool things.</li>
+</ol>
+
+<!-- Link to make image clickable -->
+<a href="https://en.wikipedia.org/wiki/Cat">
+    <!-- HTML image insertion -->
+    <img src="Resources/orange-cat.webp" alt="An Orange Cat sitting and staring at camera." width="300">
+</a>
+</body>
+</html>

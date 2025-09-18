@@ -1,0 +1,11 @@
+ol {
+    list-style-type: square;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ccc;
+}
+
+li {
+    color: darkred;
+    margin: 5px 0;
+}
