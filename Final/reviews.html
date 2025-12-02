@@ -1,0 +1,262 @@
+<!DOCTYPE html> <!-- Declare this document as HTML5 -->
+<html lang="en"> <!-- Set page language to English -->
+<head>
+    <meta charset="UTF-8"> <!-- Use UTF-8 character encoding -->
+    <title>Reviews | Britebyte Computer Repair</title> <!-- Page title shown in browser tab -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Make layout responsive on mobile devices -->
+    <link rel="stylesheet" href="styles.css"> <!-- Link to external stylesheet for page styling -->
+</head>
+<body> <!-- Start of page body content -->
+<header class="header"> <!-- Site header with branding and main navigation -->
+    <div class="container header-inner"> <!-- Header layout wrapper for spacing and alignment -->
+        <div class="brand"> <!-- Company logo/brand area -->
+            <img src="Assets/logo.png" alt="Britebyte Computer Repair logo" class="logo"> <!-- Company logo image -->
+        </div>
+        <nav class="nav"> <!-- Main navigation menu -->
+            <a href="index.html">Home</a> <!-- Link to Home page -->
+            <a href="about.html">About</a> <!-- Link to About page -->
+            <a href="reviews.html" class="active">Reviews</a> <!-- Link to Reviews page (current page highlighted) -->
+            <a href="contact.html">Contact</a> <!-- Link to Contact page -->
+        </nav>
+    </div>
+</header>
+
+<main class="container page-main"> <!-- Main content area of the page -->
+    <section class="card"> <!-- Intro card describing the reviews section -->
+        <h1>Customer Reviews</h1> <!-- Main heading for the page -->
+        <p>
+            Share your experience with Britebyte or read what other customers have said.
+            Ratings use a simple 0 to 5 star scale.
+        </p>
+    </section>
+
+    <section class="card"> <!-- Card containing the review submission form -->
+        <h2>Leave a review</h2> <!-- Form section heading -->
+        <form id="review-form" class="review-form"> <!-- Review form with unique ID for JavaScript -->
+            <div class="form-field"> <!-- Name input field wrapper -->
+                <label for="name">Name</label> <!-- Label for name input -->
+                <input id="name" name="name" type="text" required> <!-- Text input for name (required) -->
+            </div>
+            <div class="form-field"> <!-- Email input field wrapper -->
+                <label for="email">Email</label> <!-- Label for email input -->
+                <input id="email" name="email" type="email" required> <!-- Email input (required and validated as email) -->
+            </div>
+            <div class="form-field"> <!-- Rating selector wrapper -->
+                <label for="rating">Rating (0–5 stars)</label> <!-- Label for rating dropdown -->
+                <select id="rating" name="rating" required> <!-- Select element for rating (required) -->
+                    <option value="">Select</option> <!-- Placeholder option -->
+                    <option value="0">0 – Very unhappy</option> <!-- Rating option 0 -->
+                    <option value="1">1</option> <!-- Rating option 1 -->
+                    <option value="2">2</option> <!-- Rating option 2 -->
+                    <option value="3">3 – OK</option> <!-- Rating option 3 -->
+                    <option value="4">4</option> <!-- Rating option 4 -->
+                    <option value="5">5 – Excellent</option> <!-- Rating option 5 -->
+                </select>
+            </div>
+            <div class="form-field"> <!-- Text review field wrapper -->
+                <label for="text">Text review</label> <!-- Label for text area -->
+                <textarea id="text" name="text" rows="4" required></textarea> <!-- Multi-line text area for the review (required) -->
+            </div>
+            <div class="form-field"> <!-- Optional image upload wrapper -->
+                <label for="image">Optional image</label> <!-- Label for image file input -->
+                <input id="image" name="image" type="file" accept="image/*"> <!-- File input for optional image (image files only) -->
+            </div>
+            <div class="form-actions"> <!-- Form button area -->
+                <button type="submit" class="btn primary">Save review</button> <!-- Submit button to save review -->
+            </div>
+        </form>
+    </section>
+
+    <section class="card"> <!-- Card displaying all saved reviews -->
+        <h2>Reviews</h2> <!-- Reviews list heading -->
+        <div id="reviews-list" class="reviews-list"></div> <!-- Container where reviews are injected by JavaScript -->
+    </section>
+</main>
+
+<footer class="container footer"> <!-- Site footer area -->
+    <div class="container footer-inner"> <!-- Footer layout wrapper -->
+        <h6><span>&copy; <span id="year"></span> Britebyte Computer Repair. All rights reserved.</span></h6> <!-- Copyright line with dynamic year -->
+        <h5><span class="footer-note">Keeping your tech bright and bite-ready.</span></h5> <!-- Short footer slogan -->
+    </div>
+</footer>
+
+<script>
+    // Insert the current year into the footer span with ID "year"
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+<script>
+    (function() { // Immediately-invoked function expression to avoid polluting global scope
+        var STORAGE_KEY = 'britebyteReviews'; // Key name used to store reviews in localStorage
+
+        // Load existing reviews from localStorage, returning an array
+        function loadReviews() {
+            try {
+                var raw = localStorage.getItem(STORAGE_KEY); // Get stored JSON string
+                if (!raw) return []; // If nothing stored, return empty list
+                var parsed = JSON.parse(raw); // Parse JSON into a JavaScript value
+                if (!Array.isArray(parsed)) return []; // Only accept arrays
+                return parsed; // Return the parsed review array
+            } catch (e) {
+                // On error (e.g., invalid JSON), return empty list
+                return [];
+            }
+        }
+
+        // Save the given review array back into localStorage
+        function saveReviews(list) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); // Stringify and store
+            } catch (e) {
+                // If saving fails (e.g., storage full), silently ignore
+            }
+        }
+
+        // Escape HTML special characters to prevent HTML injection
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, "&amp;")   // Replace ampersand
+                .replace(/</g, "&lt;")    // Replace less-than
+                .replace(/>/g, "&gt;")    // Replace greater-than
+                .replace(/"/g, "&quot;")  // Replace double quote
+                .replace(/'/g, "&#39;");  // Replace single quote
+        }
+
+        // Render the list of reviews into the #reviews-list container
+        function renderReviews() {
+            var container = document.getElementById('reviews-list'); // Find reviews container
+            if (!container) return; // If not found, exit
+
+            var reviews = loadReviews(); // Load saved reviews
+            container.innerHTML = ''; // Clear any existing content
+
+            if (!reviews.length) {
+                // If no reviews, show a simple "empty" message
+                var empty = document.createElement('p');
+                empty.className = 'empty-state';
+                empty.textContent = 'No reviews yet. Be the first to share your experience.';
+                container.appendChild(empty);
+                return;
+            }
+
+            // Clone and sort reviews so newest (largest createdAt) appear first
+            reviews
+                .slice() // Copy array so original is not modified
+                .sort(function(a, b) { return (b.createdAt || 0) - (a.createdAt || 0); })
+                .forEach(function(review) { // Loop through each review object
+                    var card = document.createElement('article'); // Create a card element
+                    card.className = 'card review-card'; // Add card styling class
+
+                    // Normalize rating into a number between 0 and 5
+                    var rating = typeof review.rating === 'number' ? review.rating : parseInt(review.rating, 10);
+                    if (isNaN(rating) || rating < 0) rating = 0;
+                    if (rating > 5) rating = 5;
+
+                    // Generate string of star characters based on rating
+                    var stars = '★★★★★'.slice(0, rating) + '☆☆☆☆☆'.slice(0, 5 - rating);
+
+                    // Format the stored timestamp into a human-readable date/time string
+                    var dateText = '';
+                    if (review.createdAt) {
+                        var d = new Date(review.createdAt); // Create Date from timestamp
+                        if (!isNaN(d.getTime())) {
+                            dateText = d.toLocaleString(); // Localized date/time string
+                        }
+                    }
+
+                    // Build the inner HTML for the review card
+                    card.innerHTML =
+                        '<div class="review-header">' +
+                        '<div class="review-meta">' +
+                        '<div class="review-name">' + escapeHtml(review.name || 'Anonymous') + '</div>' +
+//                        '<div class="review-email">' + escapeHtml(review.email || '') + '</div>' +               Hidden email address for privacy reasons, can be unhidden if needed
+                        '</div>' +
+                        '<div class="review-rating" aria-label="' + rating + ' out of 5 stars">' + stars + '</div>' +
+                        '</div>' +
+                        '<p class="review-text">' + escapeHtml(review.text || '') + '</p>' +
+                        // If an image was provided, include an <img> inside a wrapper div
+                        (review.imageData ? '<div class="review-image-wrap"><img src="' + review.imageData + '" alt="Review image"></div>' : '') +
+                        // If a date is available, display it below the review
+                        (dateText ? '<div class="review-date">' + dateText + '</div>' : '');
+
+                    container.appendChild(card); // Add the card to the reviews container
+                });
+        }
+
+        // Handle submit event from the review form
+        function handleSubmit(event) {
+            event.preventDefault(); // Prevent default form submission (no page reload)
+
+            var form = event.target; // Reference to the submitted form
+
+            // Read and trim values from form fields
+            var name = form.elements.name.value.trim();
+            var email = form.elements.email.value.trim();
+            var ratingStr = form.elements.rating.value;
+            var text = form.elements.text.value.trim();
+            var fileInput = form.elements.image;
+
+            // Basic validation: all required fields must be filled
+            if (!name || !email || !ratingStr || !text) {
+                alert('Please fill in your name, email, rating, and review text.');
+                return;
+            }
+
+            // Convert rating to an integer and ensure it’s in range 0–5
+            var rating = parseInt(ratingStr, 10);
+            if (isNaN(rating) || rating < 0 || rating > 5) {
+                alert('Rating must be a number from 0 to 5.');
+                return;
+            }
+
+            var reviews = loadReviews(); // Load existing reviews
+
+            // Helper function to finalize and store a new review
+            function finish(imageData) {
+                var review = {
+                    name: name,             // Reviewer name
+                    email: email,           // Reviewer email
+                    rating: rating,         // Numeric rating
+                    text: text,             // Review text
+                    imageData: imageData || '', // Base64 image data or empty string
+                    createdAt: Date.now()   // Timestamp of when review was created
+                };
+
+                reviews.push(review); // Add new review to list
+                saveReviews(reviews); // Save updated list
+                form.reset();         // Clear the form fields
+                renderReviews();      // Re-render reviews to show the new one
+            }
+
+            // Check if an image file was selected
+            var file = fileInput && fileInput.files && fileInput.files[0];
+            if (file) {
+                // Use FileReader to convert image file to a data URL
+                var reader = new FileReader();
+                reader.onload = function(e) { // When reading finishes successfully
+                    finish(e.target.result || ''); // Pass the data URL to finish()
+                };
+                reader.onerror = function() { // If reading fails, save without image
+                    finish('');
+                };
+                reader.readAsDataURL(file); // Start reading the file as Base64
+            } else {
+                // No image provided; save review without image data
+                finish('');
+            }
+        }
+
+        // Run once the DOM has fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            renderReviews(); // Render any existing reviews on page load
+
+            var form = document.getElementById('review-form'); // Get the review form element
+            if (form) {
+                form.addEventListener('submit', handleSubmit); // Attach submit handler
+            }
+        });
+    })(); // Immediately invoke the function to initialize everything
+</script>
+
+</body> <!-- End of page body content -->
+</html> <!-- End of HTML document -->

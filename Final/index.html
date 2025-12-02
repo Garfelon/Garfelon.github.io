@@ -1,26 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> <!-- HTML5 document declaration -->
+<html lang="en"> <!-- Set page language to English -->
 <head>
-    <meta charset="UTF-8">
-    <title>Home | Britebyte Computer Repair</title>
-    <link rel="stylesheet" href="styles.css" />
-    <!-- COLOR REFERENCE
-        Yellow - FFCC00
-        Blue -
-        Light Blue - 00CCFF
-        Lighter Blue - 7FB2FF
-        White - FFFFFF
+    <meta charset="UTF-8"> <!-- Character encoding -->
+    <title>Home | Britebyte Computer Repair</title> <!-- Page title shown in browser tab -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive layout on mobile -->
+    <link rel="stylesheet" href="styles.css"> <!-- Link to site stylesheet -->
 </head>
-<body>
-
-    <header class="header">
-        <nav class="nav">
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
+<body> <!-- Start of page content -->
+<header class="header"> <!-- Site header with brand and navigation -->
+    <div class="container header-inner"> <!-- Header layout wrapper -->
+        <div class="brand"> <!-- Company branding area -->
+            <img src="Assets/logo.png" alt="Britebyte Computer Repair logo" class="logo"> <!-- Company logo image -->
+        </div>
+        <nav class="nav"> <!-- Main navigation menu -->
+            <a href="index.html" class="active">Home</a> <!-- Link to Home (current page) -->
+            <a href="about.html">About</a> <!-- Link to About page -->
+            <a href="reviews.html">Reviews</a> <!-- Link to Reviews page -->
+            <a href="contact.html">Contact</a> <!-- Link to Contact page -->
         </nav>
-    </header>
-</body>
-</html>
+    </div>
+</header>
+
+<main class="container page-main"> <!-- Main content area -->
+    <section class="card"> <!-- Intro/hero section -->
+        <h1>Fast, friendly computer repair in your area</h1> <!-- Main headline -->
+        <p>
+            Britebyte keeps your desktops, laptops, and home office setups running smoothly.
+            If your computer is slow, infected, or refusing to start, we can help.
+        </p>
+    </section>
+
+    <section class="card"> <!-- Services section -->
+        <h2>Services</h2>
+        <ul class="list"> <!-- List of services offered -->
+            <li>Diagnostics and troubleshooting for Windows desktops and laptops</li>
+            <li>Virus, malware, and bloatware removal</li>
+            <li>SSD and RAM upgrades for faster performance</li>
+            <li>Data backup and transfer to new systems</li>
+            <li>Basic home office setup and cable cleanup</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Get started</h2>
+        <p>
+            The fastest way to reach us is through the contact form or by phone.
+            Describe what your computer is doing, and we will follow up with options and a clear estimate.
+        </p>
+
+        <h4>Our repair process</h4> <!-- heading 4 used here -->
+        <ol>
+            <li>You contact us with your computer issue.</li>
+            <li>We run diagnostics and explain what we find.</li>
+            <li>You choose how to proceed based on our recommendation.</li>
+            <li>We complete the repair and confirm everything is working.</li>
+        </ol>
+
+        <a href="contact.html" class="btn primary">Contact Britebyte</a>
+    </section>
+
+    <!-- YouTube video embed section -->
+    <section class="card">
+        <h3>Watch us make a repair!</h3>
+        <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px;">
+            <iframe
+                    src="https://www.youtube.com/embed/RBoLGV_60PE"
+                    title="YouTube video player"
+                    style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;"
+                    allowfullscreen>
+            </iframe>
+        </div>
+    </section>
+
+</main>
+
+<footer class="container footer"> <!-- Site footer area -->
+    <div class="container footer-inner"> <!-- Footer layout wrapper -->
+        <h6><span>&copy; <span id="year"></span> Britebyte Computer Repair. All rights reserved.</span></h6> <!-- Copyright line with dynamic year -->
+        <h5><span class="footer-note">Keeping your tech bright and bite-ready.</span></h5> <!-- Short footer slogan -->
+    </div>
+</footer>
+
+<script> <!-- Simple script to insert the current year -->
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body> <!-- End of page content -->
+</html> <!-- End of HTML document -->

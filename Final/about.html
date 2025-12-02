@@ -1,0 +1,94 @@
+<!DOCTYPE html> <!-- HTML5 document declaration -->
+<html lang="en"> <!-- Set page language to English -->
+<head>
+    <meta charset="UTF-8"> <!-- Character encoding -->
+    <title>About | Britebyte Computer Repair</title> <!-- Page title shown in browser tab -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsive layout on mobile -->
+    <link rel="stylesheet" href="styles.css"> <!-- Link to site stylesheet -->
+</head>
+<body> <!-- Start of page content -->
+<header class="header"> <!-- Site header with brand and navigation -->
+    <div class="container header-inner"> <!-- Header layout wrapper -->
+        <div class="brand"> <!-- Company branding area -->
+            <img src="Assets/logo.png" alt="Britebyte Computer Repair logo" class="logo"> <!-- Company logo image -->
+        </div>
+        <nav class="nav"> <!-- Main navigation menu -->
+            <a href="index.html">Home</a> <!-- Link to Home page -->
+            <a href="about.html" class="active">About</a> <!-- Link to About (current page) -->
+            <a href="reviews.html">Reviews</a> <!-- Link to Reviews page -->
+            <a href="contact.html">Contact</a> <!-- Link to Contact page -->
+        </nav>
+    </div>
+</header>
+<main class="container page-main"> <!-- Main content area -->
+    <section class="card"> <!-- About intro section -->
+        <h1>About Britebyte</h1> <!-- Section heading -->
+        <p>
+            Britebyte is a small computer repair service focused on clear communication and practical solutions.
+            Instead of selling you a new device, we try to get more life out of the one you already own whenever it makes sense.
+        </p>
+        <p>
+            From slow startup times to strange pop-ups and error messages, we explain what is happening in plain language,
+            then walk through the options before any work begins.
+        </p>
+    </section>
+    <section class="card"> <!-- Expectations list section -->
+        <h2>What you can expect</h2> <!-- Subheading -->
+        <ul class="list"> <!-- Bullet list of expectations -->
+            <li>Simple explanations without heavy jargon</li>
+            <li>Clear pricing before repairs start</li>
+            <li>Recommendations that match how you actually use your computer</li>
+            <li>Respect for your time, your data, and your privacy</li>
+        </ul>
+    </section>
+    <section class="card">
+        <h3>Service overview</h3> <!-- heading 3 used here -->
+        <table class="service-table">
+            <thead>
+            <tr><!-- 1st tr -->
+                <th>Service</th>       <!-- 1st th -->
+                <th>How it’s done</th> <!-- 2nd th -->
+                <th>Typical time</th>  <!-- 3rd th -->
+                <th>Starting price</th><!-- 4th th -->
+            </tr>
+            </thead>
+            <tbody>
+            <tr> <!-- 2nd tr -->
+                <td>Diagnostics</td>
+                <td>In-person</td>
+                <td>20–40 minutes</td>
+                <td>$20</td>
+            </tr>
+            <tr> <!-- 3rd tr -->
+                <td>Virus removal</td>
+                <td>In-person or remote</td>
+                <td>1–2 hours</td>
+                <td>$30</td>
+            </tr>
+            <tr> <!-- 4th tr -->
+                <td>Performance tune-up</td>
+                <td>In-person</td>
+                <td>5–6 hours</td>
+                <td>$80</td>
+            </tr>
+            <tr> <!-- 5th tr -->
+                <td>Hardware upgrades</td>
+                <td>In-person</td>
+                <td>Varies by job</td>
+                <td>Varies by job</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+<footer class="container footer"> <!-- Site footer area -->
+    <div class="container footer-inner"> <!-- Footer layout wrapper -->
+        <h6><span>&copy; <span id="year"></span> Britebyte Computer Repair. All rights reserved.</span></h6> <!-- Copyright line with dynamic year -->
+        <h5><span class="footer-note">Keeping your tech bright and bite-ready.</span></h5> <!-- Short footer slogan -->
+    </div>
+</footer>
+<script> <!-- Simple script to insert the current year -->
+    document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body> <!-- End of page content -->
+</html> <!-- End of HTML document -->
